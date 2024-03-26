@@ -1,10 +1,14 @@
 package com.fangchen.oj.model.dto.problem;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fangchen.oj.common.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,21 +20,11 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ProblemQueryRequest extends PageRequest implements Serializable {
-
     /**
      * id
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
-
-    /**
-     * id
-     */
-    private Long notId;
-
-    /**
-     * 搜索词
-     */
-    private String searchText;
 
     /**
      * 标题
@@ -43,14 +37,49 @@ public class ProblemQueryRequest extends PageRequest implements Serializable {
     private String content;
 
     /**
-     * 标签列表
+     * 标签列表（json 数组）
      */
-    private List<String> tags;
+    private String tags;
 
     /**
-     * 至少有一个标签
+     * 难度
      */
-    private List<String> orTags;
+    private Object difficulty;
+
+    /**
+     * 答案
+     */
+    private String answer;
+
+    /**
+     * 提交数
+     */
+    private Integer submitNum;
+
+    /**
+     * 通过数
+     */
+    private Integer acceptNum;
+
+    /**
+     * 评测用例 (json 数组)
+     */
+    private String judgeCase;
+
+    /**
+     * 评测配置 (json 对象)
+     */
+    private String judgeConfig;
+
+    /**
+     * 点赞数
+     */
+    private Integer thumbNum;
+
+    /**
+     * 收藏数
+     */
+    private Integer favourNum;
 
     /**
      * 创建用户 id
@@ -58,9 +87,20 @@ public class ProblemQueryRequest extends PageRequest implements Serializable {
     private Long userId;
 
     /**
-     * 收藏用户 id
+     * 创建时间
      */
-    private Long favourUserId;
+    private Date createTime;
 
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 是否删除
+     */
+    private Integer isDelete;
+
+    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }
