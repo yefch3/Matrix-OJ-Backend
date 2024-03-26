@@ -1,4 +1,4 @@
-package mapper;
+package com.fangchen.oj.mapper;
 
 import com.fangchen.oj.model.entity.ProblemSubmit;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
