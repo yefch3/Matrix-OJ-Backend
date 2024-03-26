@@ -17,4 +17,4 @@ create table if not exists problem
     updateTime  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete    tinyint  default 0                 not null comment '是否删除',
     index idx_userId (userId)
-) comment '题目' collate = utf8mb4_unicode_ci;
+) comment '题目表' collate = utf8mb4_unicode_ci;
