@@ -207,22 +207,22 @@ public class ProblemController {
 
     // endregion
 
-    /**
-     * 分页搜索（从 ES 查询，封装类）
-     *
-     * @param problemQueryRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/search/page/vo")
-    public BaseResponse<Page<ProblemVO>> searchProblemVOByPage(@RequestBody ProblemQueryRequest problemQueryRequest,
-                                                         HttpServletRequest request) {
-        long size = problemQueryRequest.getPageSize();
-        // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<Problem> problemPage = problemService.searchFromEs(problemQueryRequest);
-        return ResultUtils.success(problemService.getProblemVOPage(problemPage, request));
-    }
+//    /**
+//     * 分页搜索（从 ES 查询，封装类）
+//     *
+//     * @param problemQueryRequest
+//     * @param request
+//     * @return
+//     */
+//    @PostMapping("/search/page/vo")
+//    public BaseResponse<Page<ProblemVO>> searchProblemVOByPage(@RequestBody ProblemQueryRequest problemQueryRequest,
+//                                                         HttpServletRequest request) {
+//        long size = problemQueryRequest.getPageSize();
+//        // 限制爬虫
+//        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+//        Page<Problem> problemPage = problemService.searchFromEs(problemQueryRequest);
+//        return ResultUtils.success(problemService.getProblemVOPage(problemPage, request));
+//    }
 
     /**
      * 编辑（用户）

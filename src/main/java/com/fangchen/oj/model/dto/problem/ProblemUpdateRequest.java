@@ -36,7 +36,7 @@ public class ProblemUpdateRequest implements Serializable {
     /**
      * 标签列表（json 数组）
      */
-    private String tags;
+    private List<String> tags;
 
     /**
      * 难度
@@ -49,54 +49,14 @@ public class ProblemUpdateRequest implements Serializable {
     private String answer;
 
     /**
-     * 提交数
-     */
-    private Integer submitNum;
-
-    /**
-     * 通过数
-     */
-    private Integer acceptNum;
-
-    /**
      * 评测用例 (json 数组)
      */
-    private String judgeCase;
+    private List<JudgeCase> judgeCase;
 
     /**
      * 评测配置 (json 对象)
      */
-    private String judgeConfig;
-
-    /**
-     * 点赞数
-     */
-    private Integer thumbNum;
-
-    /**
-     * 收藏数
-     */
-    private Integer favourNum;
-
-    /**
-     * 创建用户 id
-     */
-    private Long userId;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 是否删除
-     */
-    private Integer isDelete;
+    private JudgeConfig judgeConfig;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
