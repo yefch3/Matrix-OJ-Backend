@@ -125,6 +125,7 @@ public class ProblemVO implements Serializable {
         ProblemVO problemVO = new ProblemVO();
         BeanUtils.copyProperties(problem, problemVO);
         problemVO.setTags(JSONUtil.toList(problem.getTags(), String.class));
+        problemVO.setJudgeConfig(JSONUtil.toBean(problem.getJudgeConfig(), JudgeConfig.class));
         return problemVO;
     }
 }

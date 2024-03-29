@@ -30,7 +30,7 @@ public interface ProblemService extends IService<Problem> {
      * @param problemQueryRequest
      * @return
      */
-    QueryWrapper<Problem> getQueryWrapper(ProblemQueryRequest problemQueryRequ1est);
+    QueryWrapper<Problem> getQueryWrapper(ProblemQueryRequest problemQueryRequest);
 
 //    /**
 //     * 从 ES 查询

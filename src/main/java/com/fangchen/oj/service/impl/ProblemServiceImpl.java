@@ -8,9 +8,6 @@ import com.fangchen.oj.common.ErrorCode;
 import com.fangchen.oj.constant.CommonConstant;
 import com.fangchen.oj.exception.BusinessException;
 import com.fangchen.oj.exception.ThrowUtils;
-import com.fangchen.oj.mapper.ProblemFavourMapper;
-import com.fangchen.oj.mapper.ProblemThumbMapper;
-import com.fangchen.oj.model.dto.problem.ProblemEsDTO;
 import com.fangchen.oj.model.dto.problem.ProblemQueryRequest;
 import com.fangchen.oj.model.entity.*;
 import com.fangchen.oj.model.vo.ProblemVO;
@@ -21,17 +18,17 @@ import com.fangchen.oj.service.UserService;
 import com.fangchen.oj.utils.SqlUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+//import org.elasticsearch.index.query.BoolQueryBuilder;
+//import org.elasticsearch.index.query.QueryBuilders;
+//import org.elasticsearch.search.sort.SortBuilder;
+//import org.elasticsearch.search.sort.SortBuilders;
+//import org.elasticsearch.search.sort.SortOrder;
+//import org.springframework.data.domain.PageRequest;
+//import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+//import org.springframework.data.elasticsearch.core.SearchHit;
+//import org.springframework.data.elasticsearch.core.SearchHits;
+//import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+//import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -277,25 +274,25 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
                 .collect(Collectors.groupingBy(User::getId));
         // 2. 已登录，获取用户点赞、收藏状态
-        Map<Long, Boolean> problemIdHasThumbMap = new HashMap<>();
-        Map<Long, Boolean> problemIdHasFavourMap = new HashMap<>();
-        User loginUser = userService.getLoginUserPermitNull(request);
-        if (loginUser != null) {
-            Set<Long> problemIdSet = problemList.stream().map(Problem::getId).collect(Collectors.toSet());
-            loginUser = userService.getLoginUser(request);
-            // 获取点赞
-            QueryWrapper<ProblemThumb> problemThumbQueryWrapper = new QueryWrapper<>();
-            problemThumbQueryWrapper.in("problemId", problemIdSet);
-            problemThumbQueryWrapper.eq("userId", loginUser.getId());
-            List<ProblemThumb> problemProblemThumbList = problemThumbMapper.selectList(problemThumbQueryWrapper);
-            problemProblemThumbList.forEach(problemProblemThumb -> problemIdHasThumbMap.put(problemProblemThumb.getProblemId(), true));
-            // 获取收藏
-            QueryWrapper<ProblemFavour> problemFavourQueryWrapper = new QueryWrapper<>();
-            problemFavourQueryWrapper.in("problemId", problemIdSet);
-            problemFavourQueryWrapper.eq("userId", loginUser.getId());
-            List<ProblemFavour> problemFavourList = problemFavourMapper.selectList(problemFavourQueryWrapper);
-            problemFavourList.forEach(problemFavour -> problemIdHasFavourMap.put(problemFavour.getProblemId(), true));
-        }
+//        Map<Long, Boolean> problemIdHasThumbMap = new HashMap<>();
+//        Map<Long, Boolean> problemIdHasFavourMap = new HashMap<>();
+//        User loginUser = userService.getLoginUserPermitNull(request);
+//        if (loginUser != null) {
+//            Set<Long> problemIdSet = problemList.stream().map(Problem::getId).collect(Collectors.toSet());
+//            loginUser = userService.getLoginUser(request);
+//            // 获取点赞
+//            QueryWrapper<ProblemThumb> problemThumbQueryWrapper = new QueryWrapper<>();
+//            problemThumbQueryWrapper.in("problemId", problemIdSet);
+//            problemThumbQueryWrapper.eq("userId", loginUser.getId());
+//            List<ProblemThumb> problemProblemThumbList = problemThumbMapper.selectList(problemThumbQueryWrapper);
+//            problemProblemThumbList.forEach(problemProblemThumb -> problemIdHasThumbMap.put(problemProblemThumb.getProblemId(), true));
+//            // 获取收藏
+//            QueryWrapper<ProblemFavour> problemFavourQueryWrapper = new QueryWrapper<>();
+//            problemFavourQueryWrapper.in("problemId", problemIdSet);
+//            problemFavourQueryWrapper.eq("userId", loginUser.getId());
+//            List<ProblemFavour> problemFavourList = problemFavourMapper.selectList(problemFavourQueryWrapper);
+//            problemFavourList.forEach(problemFavour -> problemIdHasFavourMap.put(problemFavour.getProblemId(), true));
+//        }
         // 填充信息
         List<ProblemVO> problemVOList = problemList.stream().map(problem -> {
             ProblemVO problemVO = ProblemVO.objToVo(problem);
@@ -304,9 +301,9 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             if (userIdUserListMap.containsKey(userId)) {
                 user = userIdUserListMap.get(userId).get(0);
             }
-            problemVO.setUser(userService.getUserVO(user));
-            problemVO.setHasThumb(problemIdHasThumbMap.getOrDefault(problem.getId(), false));
-            problemVO.setHasFavour(problemIdHasFavourMap.getOrDefault(problem.getId(), false));
+            problemVO.setUserVO(userService.getUserVO(user));
+//            problemVO.setHasThumb(problemIdHasThumbMap.getOrDefault(problem.getId(), false));
+//            problemVO.setHasFavour(problemIdHasFavourMap.getOrDefault(problem.getId(), false));
             return problemVO;
         }).collect(Collectors.toList());
         problemVOPage.setRecords(problemVOList);

@@ -4,7 +4,7 @@ import com.fangchen.oj.common.BaseResponse;
 import com.fangchen.oj.common.ErrorCode;
 import com.fangchen.oj.common.ResultUtils;
 import com.fangchen.oj.exception.BusinessException;
-import com.fangchen.oj.model.dto.postthumb.ProblemSubmitAddRequest;
+import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitAddRequest;
 import com.fangchen.oj.model.entity.User;
 import com.fangchen.oj.service.ProblemSubmitService;
 import com.fangchen.oj.service.UserService;
@@ -41,15 +41,14 @@ public class ProblemSubmitController {
      * @return resultNum 本次点赞变化数
      */
     @PostMapping("/")
-    public BaseResponse<Integer> doThumb(@RequestBody ProblemSubmitAddRequest problemSubmitAddRequest,
+    public BaseResponse<Long> doProblemSubmit(@RequestBody ProblemSubmitAddRequest problemSubmitAddRequest,
                                          HttpServletRequest request) {
         if (problemSubmitAddRequest == null || problemSubmitAddRequest.getProblemId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 登录才能点赞
         final User loginUser = userService.getLoginUser(request);
-        long postId = problemSubmitAddRequest.getProblemId();
-        int result = problemSubmitService.doProblemSubmit(postId, loginUser);
+        long result = problemSubmitService.doProblemSubmit(problemSubmitAddRequest, loginUser);
         return ResultUtils.success(result);
     }
 
