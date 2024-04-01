@@ -10,10 +10,7 @@ import com.fangchen.oj.common.ResultUtils;
 import com.fangchen.oj.constant.UserConstant;
 import com.fangchen.oj.exception.BusinessException;
 import com.fangchen.oj.exception.ThrowUtils;
-import com.fangchen.oj.model.dto.problem.ProblemAddRequest;
-import com.fangchen.oj.model.dto.problem.ProblemEditRequest;
-import com.fangchen.oj.model.dto.problem.ProblemQueryRequest;
-import com.fangchen.oj.model.dto.problem.ProblemUpdateRequest;
+import com.fangchen.oj.model.dto.problem.*;
 import com.fangchen.oj.model.entity.Problem;
 import com.fangchen.oj.model.entity.User;
 import com.fangchen.oj.model.vo.ProblemVO;
@@ -61,6 +58,8 @@ public class ProblemController {
         Problem problem = new Problem();
         BeanUtils.copyProperties(problemAddRequest, problem);
         List<String> tags = problemAddRequest.getTags();
+        JudgeConfig judgeConfig = problemAddRequest.getJudgeConfig();
+        List<JudgeCase> judgeCase = problemAddRequest.getJudgeCase();
         if (tags != null) {
             problem.setTags(JSONUtil.toJsonStr(tags));
         }
@@ -69,6 +68,8 @@ public class ProblemController {
         problem.setUserId(loginUser.getId());
         problem.setFavourNum(0);
         problem.setThumbNum(0);
+        problem.setJudgeConfig(JSONUtil.toJsonStr(judgeConfig));
+        problem.setJudgeCase(JSONUtil.toJsonStr(judgeCase));
         boolean result = problemService.save(problem);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newProblemId = problem.getId();
@@ -115,8 +116,16 @@ public class ProblemController {
         Problem problem = new Problem();
         BeanUtils.copyProperties(problemUpdateRequest, problem);
         List<String> tags = problemUpdateRequest.getTags();
+        List<JudgeCase> judgeCase = problemUpdateRequest.getJudgeCase();
+        Integer difficulty = problemUpdateRequest.getDifficulty();
         if (tags != null) {
             problem.setTags(JSONUtil.toJsonStr(tags));
+        }
+        if (judgeCase != null) {
+            problem.setJudgeCase(JSONUtil.toJsonStr(judgeCase));
+        }
+        if (difficulty != null) {
+            problem.setDifficulty(difficulty);
         }
         // 参数校验
         problemService.validProblem(problem, false);
