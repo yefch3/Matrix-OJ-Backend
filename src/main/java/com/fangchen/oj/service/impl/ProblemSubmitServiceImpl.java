@@ -8,6 +8,7 @@ import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitAddRequest;
 import com.fangchen.oj.model.entity.Problem;
 import com.fangchen.oj.model.entity.ProblemSubmit;
 import com.fangchen.oj.model.entity.User;
+import com.fangchen.oj.model.enums.ProblemSubmitLanguageEnum;
 import com.fangchen.oj.service.ProblemService;
 import com.fangchen.oj.service.ProblemSubmitService;
 import com.fangchen.oj.mapper.ProblemSubmitMapper;
@@ -37,13 +38,19 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
      */
     @Override
     public long doProblemSubmit(ProblemSubmitAddRequest problemSubmitAddRequest, User loginUser) {
+        // 判断语言是否合法
+        String language = problemSubmitAddRequest.getLanguage();
+        ProblemSubmitLanguageEnum.getEnumByValue(language);
+        if (language == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Wrong Language");
+
+        }
         long problemId = problemSubmitAddRequest.getProblemId();
         // 判断实体是否存在，根据类别获取实体
         Problem problem = problemService.getById(problemId);
         if (problem == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        // 是否已点赞
         long userId = loginUser.getId();
         // 每个用户串行提交题目
         // 锁必须要包裹住事务方法
@@ -55,12 +62,12 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
         problemSubmit.setUserId(userId);
         problemSubmit.setProblemId(problemId);
         problemSubmit.setCode(problemSubmitAddRequest.getCode());
-        problemSubmit.setLanguage(problemSubmitAddRequest.getLanguage());
+        problemSubmit.setLanguage(language);
         problemSubmit.setStatus(0);
         problemSubmit.setJudgeResult("{}");
         boolean save = this.save(problemSubmit);
         if (!save) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "submit error");
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "Submit Error");
         }
         return problemSubmit.getId();
     }

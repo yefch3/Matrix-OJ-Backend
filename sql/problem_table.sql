@@ -4,7 +4,7 @@ create table if not exists problem
     title       varchar(512)                       null comment '标题',
     content     text                               null comment '内容',
     tags        varchar(1024)                      null comment '标签列表（json 数组）',
-    difficulty  enum ('Easy', 'Medium', 'Hard')    null comment '难度',
+    difficulty  tinyint                            null comment '难度 (0: 简单, 1: 中等, 2: 困难)',
     answer      text                               null comment '答案',
     submitNum   int      default 0                 not null comment '提交数',
     acceptNum   int      default 0                 not null comment '通过数',

@@ -44,7 +44,7 @@ public class ProblemQueryRequest extends PageRequest implements Serializable {
     /**
      * 难度
      */
-    private Object difficulty;
+    private Integer difficulty;
 
     /**
      * 答案

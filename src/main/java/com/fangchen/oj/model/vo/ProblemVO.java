@@ -40,7 +40,7 @@ public class ProblemVO implements Serializable {
     /**
      * 难度
      */
-    private Object difficulty;
+    private Integer difficulty;
 
 
     /**

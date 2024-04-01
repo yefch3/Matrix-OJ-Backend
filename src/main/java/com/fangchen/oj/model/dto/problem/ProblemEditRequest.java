@@ -41,7 +41,7 @@ public class ProblemEditRequest implements Serializable {
     /**
      * 难度
      */
-    private Object difficulty;
+    private Integer difficulty;
 
     /**
      * 答案

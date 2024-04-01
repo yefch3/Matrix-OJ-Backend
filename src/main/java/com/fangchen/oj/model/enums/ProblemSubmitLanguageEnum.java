@@ -1,11 +1,13 @@
 package com.fangchen.oj.model.enums;
 
+import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
 public enum ProblemSubmitLanguageEnum {
     JAVA("Java", "Java"),
     C("C", "C"),
@@ -36,11 +38,4 @@ public enum ProblemSubmitLanguageEnum {
         return null;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public String getText() {
-        return text;
-    }
 }

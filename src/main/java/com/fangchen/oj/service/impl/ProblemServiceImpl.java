@@ -10,6 +10,7 @@ import com.fangchen.oj.exception.BusinessException;
 import com.fangchen.oj.exception.ThrowUtils;
 import com.fangchen.oj.model.dto.problem.ProblemQueryRequest;
 import com.fangchen.oj.model.entity.*;
+import com.fangchen.oj.model.enums.ProblemDifficulty;
 import com.fangchen.oj.model.vo.ProblemVO;
 import com.fangchen.oj.model.vo.UserVO;
 import com.fangchen.oj.service.ProblemService;
@@ -66,14 +67,14 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         String title = problem.getTitle();
         String content = problem.getContent();
         String tags = problem.getTags();
-        Object difficulty = problem.getDifficulty();
+        Integer difficulty = problem.getDifficulty();
         String answer = problem.getAnswer();
         String judgeCase = problem.getJudgeCase();
         String judgeConfig = problem.getJudgeConfig();
 
         // 创建时，参数不能为空
         if (add) {
-            ThrowUtils.throwIf(StringUtils.isAnyBlank(title, content, tags, (String)difficulty), ErrorCode.PARAMS_ERROR);
+            ThrowUtils.throwIf(StringUtils.isAnyBlank(title, content, tags), ErrorCode.PARAMS_ERROR);
         }
         // 有参数则校验
         if (StringUtils.isNotBlank(title) && title.length() > 80) {
@@ -91,6 +92,10 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         }
         if (StringUtils.isNotBlank(judgeConfig) && content.length() > 8192) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "judge config too long");
+        }
+        // 校验难度是否为合法值，其中 difficulty 为枚举值，在枚举类中定义
+        if (ObjectUtils.isNotEmpty(difficulty) && !ProblemDifficulty.getValues().contains(difficulty)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "difficulty error");
         }
     }
 
@@ -111,7 +116,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         String title = problemQueryRequest.getTitle();
         String content = problemQueryRequest.getContent();
         List<String> tags = problemQueryRequest.getTags();
-        Object difficulty = problemQueryRequest.getDifficulty();
+        Integer difficulty = problemQueryRequest.getDifficulty();
         String answer = problemQueryRequest.getAnswer();
         Long userId = problemQueryRequest.getUserId();
         String sortField = problemQueryRequest.getSortField();
