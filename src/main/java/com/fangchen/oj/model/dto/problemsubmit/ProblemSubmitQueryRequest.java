@@ -1,6 +1,8 @@
 package com.fangchen.oj.model.dto.problemsubmit;
 
+import com.fangchen.oj.common.PageRequest;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -11,7 +13,8 @@ import java.io.Serializable;
  * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @Data
-public class ProblemSubmitQueryRequest implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class ProblemSubmitQueryRequest extends PageRequest implements Serializable {
     /**
      * 题目 id
      */

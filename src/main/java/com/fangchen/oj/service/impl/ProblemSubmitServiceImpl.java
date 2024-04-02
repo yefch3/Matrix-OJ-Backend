@@ -1,23 +1,37 @@
 package com.fangchen.oj.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fangchen.oj.common.ErrorCode;
+import com.fangchen.oj.constant.CommonConstant;
 import com.fangchen.oj.exception.BusinessException;
 import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitAddRequest;
+import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitQueryRequest;
 import com.fangchen.oj.model.entity.Problem;
 import com.fangchen.oj.model.entity.ProblemSubmit;
 import com.fangchen.oj.model.entity.User;
 import com.fangchen.oj.model.enums.ProblemSubmitLanguageEnum;
+import com.fangchen.oj.model.enums.ProblemSubmitStatusEnum;
+import com.fangchen.oj.model.vo.ProblemSubmitVO;
+import com.fangchen.oj.model.vo.UserVO;
 import com.fangchen.oj.service.ProblemService;
 import com.fangchen.oj.service.ProblemSubmitService;
 import com.fangchen.oj.mapper.ProblemSubmitMapper;
-import org.springframework.aop.framework.AopContext;
+import com.fangchen.oj.service.UserService;
+import com.fangchen.oj.utils.SqlUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
 * @author fangchen.ye
@@ -28,6 +42,9 @@ import javax.annotation.Resource;
 public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, ProblemSubmit> implements ProblemSubmitService {
     @Resource
     private ProblemService problemService;
+
+    @Resource
+    private UserService userService;
 
     /**
      * 题目提交
@@ -115,6 +132,60 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR);
             }
         }
+    }
+
+
+    @Override
+    public QueryWrapper<ProblemSubmit> getQueryWrapper(ProblemSubmitQueryRequest problemSubmitQueryRequest) {
+        QueryWrapper<ProblemSubmit> queryWrapper = new QueryWrapper<>();
+        if (problemSubmitQueryRequest == null) {
+            return queryWrapper;
+        }
+
+        Long problemId = problemSubmitQueryRequest.getProblemId();
+        String language = problemSubmitQueryRequest.getLanguage();
+        Integer status = problemSubmitQueryRequest.getStatus();
+        Long userId = problemSubmitQueryRequest.getUserId();
+        String sortField = problemSubmitQueryRequest.getSortField();
+        String sortOrder = problemSubmitQueryRequest.getSortOrder();
+
+        queryWrapper.eq(ObjectUtils.isNotEmpty(problemId), "problemId", problemId)
+                .eq(StringUtils.isNotBlank(language), "language", language)
+                .eq(ProblemSubmitStatusEnum.getEnumByValue(status) != null, "status", status)
+                .eq(ObjectUtils.isNotEmpty(userId), "userId", userId)
+                .eq("is_delete", false)
+                .orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
+        return queryWrapper;
+    }
+
+    @Override
+    public ProblemSubmitVO getProblemSubmitVO(ProblemSubmit problemSubmit, User loginUser) {
+        ProblemSubmitVO problemSubmitVO = ProblemSubmitVO.objToVo(problemSubmit);
+        // filter
+        long userId = loginUser.getId();
+        if (userId != problemSubmit.getUserId() && !userService.isAdmin(loginUser)) {
+            problemSubmitVO.setCode(null);
+        }
+        return problemSubmitVO;
+    }
+
+    @Override
+    public Page<ProblemSubmitVO> getProblemSubmitVOPage(Page<ProblemSubmit> problemSubmitPage, User loginUser) {
+        List<ProblemSubmit> problemSubmitList = problemSubmitPage.getRecords();
+        Page<ProblemSubmitVO> problemSubmitVOPage = new Page<>(problemSubmitPage.getCurrent(), problemSubmitPage.getSize(), problemSubmitPage.getTotal());
+        if (CollUtil.isEmpty(problemSubmitList)) {
+            return problemSubmitVOPage;
+        }
+        // 1. 关联查询用户信息
+        Set<Long> userIdSet = problemSubmitList.stream().map(ProblemSubmit::getUserId).collect(Collectors.toSet());
+        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
+                .collect(Collectors.groupingBy(User::getId));
+        // 填充信息
+        List<ProblemSubmitVO> problemSubmitVOList = problemSubmitList.stream()
+                .map(problemSubmit -> getProblemSubmitVO(problemSubmit, loginUser))
+                .collect(Collectors.toList());
+        problemSubmitVOPage.setRecords(problemSubmitVOList);
+        return problemSubmitVOPage;
     }
 }
 

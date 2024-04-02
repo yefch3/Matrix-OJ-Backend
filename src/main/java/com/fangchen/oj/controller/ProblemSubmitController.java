@@ -13,6 +13,7 @@ import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitQueryRequest;
 import com.fangchen.oj.model.entity.Post;
 import com.fangchen.oj.model.entity.ProblemSubmit;
 import com.fangchen.oj.model.entity.User;
+import com.fangchen.oj.model.vo.ProblemSubmitVO;
 import com.fangchen.oj.service.ProblemSubmitService;
 import com.fangchen.oj.service.UserService;
 import javax.annotation.Resource;
@@ -66,9 +67,16 @@ public class ProblemSubmitController {
      * @return
      */
     @PostMapping("/list/page")
-    public BaseResponse<Page<Post>> listProblemSubmitByPage(@RequestBody ProblemSubmitQueryRequest problemSubmitQueryRequest) {
-        // todo
-        return null;
+    public BaseResponse<Page<ProblemSubmitVO>> listProblemSubmitByPage(@RequestBody ProblemSubmitQueryRequest problemSubmitQueryRequest,
+                                                                       HttpServletRequest request) {
+        long current = problemSubmitQueryRequest.getCurrent();
+        long size = problemSubmitQueryRequest.getPageSize();
+        final User loginUser = userService.getLoginUser(request);
+        // 从数据库中查询原始的题目提交分页信息
+        Page<ProblemSubmit> problemSubmitPage = problemSubmitService.page(new Page<>(current, size),
+                problemSubmitService.getQueryWrapper(problemSubmitQueryRequest));
+        // filter
+        return ResultUtils.success(problemSubmitService.getProblemSubmitVOPage(problemSubmitPage, loginUser));
     }
 
 }
