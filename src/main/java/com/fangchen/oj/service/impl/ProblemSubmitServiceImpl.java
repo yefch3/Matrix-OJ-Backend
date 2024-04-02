@@ -39,11 +39,10 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
     @Override
     public long doProblemSubmit(ProblemSubmitAddRequest problemSubmitAddRequest, User loginUser) {
         // 判断语言是否合法
-        String language = problemSubmitAddRequest.getLanguage();
-        ProblemSubmitLanguageEnum.getEnumByValue(language);
+        ProblemSubmitLanguageEnum language = ProblemSubmitLanguageEnum.getEnumByValue(problemSubmitAddRequest.getLanguage());
+        System.out.println("language: " + language);
         if (language == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "Wrong Language");
-
         }
         long problemId = problemSubmitAddRequest.getProblemId();
         // 判断实体是否存在，根据类别获取实体
@@ -62,7 +61,7 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
         problemSubmit.setUserId(userId);
         problemSubmit.setProblemId(problemId);
         problemSubmit.setCode(problemSubmitAddRequest.getCode());
-        problemSubmit.setLanguage(language);
+        problemSubmit.setLanguage(language.getValue());
         problemSubmit.setStatus(0);
         problemSubmit.setJudgeResult("{}");
         boolean save = this.save(problemSubmit);

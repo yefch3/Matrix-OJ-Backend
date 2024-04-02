@@ -1,10 +1,17 @@
 package com.fangchen.oj.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fangchen.oj.annotation.AuthCheck;
 import com.fangchen.oj.common.BaseResponse;
 import com.fangchen.oj.common.ErrorCode;
 import com.fangchen.oj.common.ResultUtils;
+import com.fangchen.oj.constant.UserConstant;
 import com.fangchen.oj.exception.BusinessException;
+import com.fangchen.oj.model.dto.post.PostQueryRequest;
 import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitAddRequest;
+import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitQueryRequest;
+import com.fangchen.oj.model.entity.Post;
+import com.fangchen.oj.model.entity.ProblemSubmit;
 import com.fangchen.oj.model.entity.User;
 import com.fangchen.oj.service.ProblemSubmitService;
 import com.fangchen.oj.service.UserService;
@@ -34,11 +41,11 @@ public class ProblemSubmitController {
     private UserService userService;
 
     /**
-     * 点赞 / 取消点赞
+     * 题目提交
      *
      * @param problemSubmitAddRequest
      * @param request
-     * @return resultNum 本次点赞变化数
+     * @return resultNum 题目提交ID
      */
     @PostMapping("/")
     public BaseResponse<Long> doProblemSubmit(@RequestBody ProblemSubmitAddRequest problemSubmitAddRequest,
@@ -50,6 +57,18 @@ public class ProblemSubmitController {
         final User loginUser = userService.getLoginUser(request);
         long result = problemSubmitService.doProblemSubmit(problemSubmitAddRequest, loginUser);
         return ResultUtils.success(result);
+    }
+
+    /**
+     * 题目提交列表
+     *
+     * @param problemSubmitQueryRequest
+     * @return
+     */
+    @PostMapping("/list/page")
+    public BaseResponse<Page<Post>> listProblemSubmitByPage(@RequestBody ProblemSubmitQueryRequest problemSubmitQueryRequest) {
+        // todo
+        return null;
     }
 
 }

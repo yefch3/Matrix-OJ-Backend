@@ -63,13 +63,17 @@ public class ProblemController {
         if (tags != null) {
             problem.setTags(JSONUtil.toJsonStr(tags));
         }
+        if (judgeConfig != null) {
+            problem.setJudgeConfig(JSONUtil.toJsonStr(judgeConfig));
+        }
+        if (judgeCase != null) {
+            problem.setJudgeCase(JSONUtil.toJsonStr(judgeCase));
+        }
         problemService.validProblem(problem, true);
         User loginUser = userService.getLoginUser(request);
         problem.setUserId(loginUser.getId());
         problem.setFavourNum(0);
         problem.setThumbNum(0);
-        problem.setJudgeConfig(JSONUtil.toJsonStr(judgeConfig));
-        problem.setJudgeCase(JSONUtil.toJsonStr(judgeCase));
         boolean result = problemService.save(problem);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newProblemId = problem.getId();
