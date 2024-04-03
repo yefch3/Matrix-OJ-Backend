@@ -15,7 +15,6 @@ import com.fangchen.oj.model.entity.User;
 import com.fangchen.oj.model.enums.ProblemSubmitLanguageEnum;
 import com.fangchen.oj.model.enums.ProblemSubmitStatusEnum;
 import com.fangchen.oj.model.vo.ProblemSubmitVO;
-import com.fangchen.oj.model.vo.UserVO;
 import com.fangchen.oj.service.ProblemService;
 import com.fangchen.oj.service.ProblemSubmitService;
 import com.fangchen.oj.mapper.ProblemSubmitMapper;
@@ -27,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -49,9 +45,8 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
     /**
      * 题目提交
      *
-     * @param problemSubmitAddRequest
-     * @param loginUser
-     * @return
+     * @param problemSubmitAddRequest, loginUser
+     * @return problemSubmitId
      */
     @Override
     public long doProblemSubmit(ProblemSubmitAddRequest problemSubmitAddRequest, User loginUser) {
@@ -91,9 +86,8 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
     /**
      * 封装了事务的方法
      *
-     * @param userId
-     * @param problemId
-     * @return
+     * @param userId, problemId
+     * @return success
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -153,7 +147,7 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
                 .eq(StringUtils.isNotBlank(language), "language", language)
                 .eq(ProblemSubmitStatusEnum.getEnumByValue(status) != null, "status", status)
                 .eq(ObjectUtils.isNotEmpty(userId), "userId", userId)
-                .eq("is_delete", false)
+                .eq("isDelete", false)
                 .orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
         return queryWrapper;
     }
@@ -176,10 +170,6 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
         if (CollUtil.isEmpty(problemSubmitList)) {
             return problemSubmitVOPage;
         }
-        // 1. 关联查询用户信息
-        Set<Long> userIdSet = problemSubmitList.stream().map(ProblemSubmit::getUserId).collect(Collectors.toSet());
-        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
-                .collect(Collectors.groupingBy(User::getId));
         // 填充信息
         List<ProblemSubmitVO> problemSubmitVOList = problemSubmitList.stream()
                 .map(problemSubmit -> getProblemSubmitVO(problemSubmit, loginUser))

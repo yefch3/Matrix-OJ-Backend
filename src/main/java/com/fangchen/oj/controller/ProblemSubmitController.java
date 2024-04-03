@@ -44,8 +44,7 @@ public class ProblemSubmitController {
     /**
      * 题目提交
      *
-     * @param problemSubmitAddRequest
-     * @param request
+     * @param problemSubmitAddRequest, request
      * @return resultNum 题目提交ID
      */
     @PostMapping("/")
@@ -63,8 +62,8 @@ public class ProblemSubmitController {
     /**
      * 题目提交列表
      *
-     * @param problemSubmitQueryRequest
-     * @return
+     * @param problemSubmitQueryRequest, request
+     * @return Page<ProblemSubmitVO> 题目提交列表
      */
     @PostMapping("/list/page")
     public BaseResponse<Page<ProblemSubmitVO>> listProblemSubmitByPage(@RequestBody ProblemSubmitQueryRequest problemSubmitQueryRequest,
