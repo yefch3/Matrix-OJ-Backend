@@ -142,7 +142,30 @@ public class ProblemController {
     }
 
     /**
-     * 根据 id 获取
+     * 根据 id 获取所有数据
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/get")
+    public BaseResponse<Problem> getProblemById(long id, HttpServletRequest request) {
+        if (id <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Problem problem = problemService.getById(id);
+        if (problem == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        // 权限校验
+        User loginUser = userService.getLoginUser(request);
+        if (!userService.isAdmin(loginUser) && !problem.getUserId().equals(loginUser.getId())) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        return ResultUtils.success(problem);
+    }
+
+    /**
+     * 根据 id 获取脱敏数据
      *
      * @param id
      * @return
