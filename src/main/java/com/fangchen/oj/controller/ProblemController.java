@@ -147,6 +147,7 @@ public class ProblemController {
      * @param id
      * @return
      */
+    // todo 优化：增加权限校验，如果是管理员那么可以看到某些字段
     @GetMapping("/get")
     public BaseResponse<Problem> getProblemById(long id, HttpServletRequest request) {
         if (id <= 0) {
