@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 
 @Getter
 public enum ProblemSubmitLanguageEnum {
-    JAVA("Java", "Java"),
-    C("C", "C"),
-    CPP("Cpp", "C++"),
-    PYTHON("Python", "Python");
+    JAVA("java", "java"),
+    C("c", "c"),
+    CPP("cpp", "cpp"),
+    PYTHON("python", "python");
 
     private final String text;
     private final String value;
