@@ -101,3 +101,5 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - com.fangchen.oj.controller
+codesandbox:
+  type: "example"
