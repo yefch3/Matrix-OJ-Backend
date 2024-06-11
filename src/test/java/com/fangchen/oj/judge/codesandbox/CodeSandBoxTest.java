@@ -45,4 +45,20 @@ class CodeSandBoxTest {
         codeSandBox.executeCode(executeCodeRequest);
         assertNotNull(codeSandBox);
     }
+
+    @Test
+    void executeCodeByProxy() {
+        CodeSandBox codeSandBox = CodeSandBoxFactory.createCodeSandBox(type);
+        CodeSandBoxProxy codeSandBoxProxy = new CodeSandBoxProxy(codeSandBox);
+        String code = "int main() { return 0; }";
+        List<String> inputList = Arrays.asList("1", "2", "3");
+        String language = "cpp";
+        ExecuteCodeRequest executeCodeRequest = ExecuteCodeRequest.builder()
+                .code(code)
+                .inputList(inputList)
+                .language(language)
+                .build();
+        codeSandBoxProxy.executeCode(executeCodeRequest);
+        assertNotNull(codeSandBoxProxy);
+    }
 }
