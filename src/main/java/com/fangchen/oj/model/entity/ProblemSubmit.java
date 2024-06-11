@@ -42,6 +42,7 @@ public class ProblemSubmit implements Serializable {
     /**
      * 状态 （0: 等待判题； 1: 判题中； 2: 成功； 3： 失败）
      */
+    // 这里仅仅指是否成功调用了判题接口进行了判题服务，和判题结果是否正确无关
     private Integer status;
 
     /**

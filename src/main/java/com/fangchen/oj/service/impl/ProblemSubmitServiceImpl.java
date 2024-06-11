@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fangchen.oj.common.ErrorCode;
 import com.fangchen.oj.constant.CommonConstant;
 import com.fangchen.oj.exception.BusinessException;
+import com.fangchen.oj.judge.JudgeService;
 import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitAddRequest;
 import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitQueryRequest;
 import com.fangchen.oj.model.entity.Problem;
@@ -41,6 +42,9 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private JudgeService judgeService;
 
     /**
      * 题目提交
@@ -81,6 +85,7 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "Submit Error");
         }
         // todo: judge
+        judgeService.doJudge(problemSubmit.getId());
         return problemSubmit.getId();
     }
 

@@ -79,7 +79,7 @@ public class JudgeServiceImpl implements JudgeService {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新提交信息失败");
         }
 
-        // 调用判题核心代码，获取判题结果
+        // 调用执行核心代码，获取执行结果
         // todo: inputList需要根据题目信息获取，最简单的就是根据题目id获取对应的输入输出文件，暂时从测试用例中获取
         CodeSandBox codeSandBox = CodeSandBoxFactory.createCodeSandBox(type);
         CodeSandBoxProxy codeSandBoxProxy = new CodeSandBoxProxy(codeSandBox);
@@ -91,7 +91,7 @@ public class JudgeServiceImpl implements JudgeService {
                 .build();
         ExecuteCodeResponse executeCodeResponse = codeSandBoxProxy.executeCode(executeCodeRequest);
 
-        // 如果判题结果为空，则判题失败
+        // 如果执行结果为空，则执行代码失败
         if (executeCodeResponse == null) {
             problemSubmit.setStatus(ProblemSubmitStatusEnum.FAILED.getValue());
             problemSubmitService.updateById(problemSubmit);
@@ -102,8 +102,17 @@ public class JudgeServiceImpl implements JudgeService {
         Long memory = judgeResult.getMemory();
         Long time = judgeResult.getTime();
         List<String> outputList = executeCodeResponse.getOutputList();
-        // 更新题目提交状态为判题完成
+
+        // 更新题目提交状态为执行代码完成
         problemSubmit.setStatus(ProblemSubmitStatusEnum.SUCCEED.getValue());
+
+        // 如果没有输出或者一些情况下，说明出现了编译错误或者系统错误等等，todo: 需要根据具体情况进行判断，暂时归结为编译错误
+        if (outputList == null || outputList.isEmpty()) {
+            judgeResult.setResult(ProblemSubmitJudgeResultEnum.COMPILE_ERROR.getValue());
+            problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
+            problemSubmitService.updateById(problemSubmit);
+            return;
+        }
 
         // 根据执行结果，判断是否通过
         // 1. 判断输出size和测试用例size是否一致
@@ -112,7 +121,7 @@ public class JudgeServiceImpl implements JudgeService {
 
         // 判断输出size和测试用例size是否一致
         if (outputList.size() != caseList.size()) {
-            judgeResult.setMessage(ProblemSubmitJudgeResultEnum.WRONG_ANSWER.getValue());
+            judgeResult.setResult(ProblemSubmitJudgeResultEnum.WRONG_ANSWER.getValue());
             problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
             problemSubmitService.updateById(problemSubmit);
             return;
@@ -121,7 +130,7 @@ public class JudgeServiceImpl implements JudgeService {
         // 判断每个输出是否和测试用例输出一致
         for (int i = 0; i < outputList.size(); i++) {
             if (!outputList.get(i).equals(caseList.get(i).getOutput())) {
-                judgeResult.setMessage(ProblemSubmitJudgeResultEnum.WRONG_ANSWER.getValue());
+                judgeResult.setResult(ProblemSubmitJudgeResultEnum.WRONG_ANSWER.getValue());
                 problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
                 problemSubmitService.updateById(problemSubmit);
                 return;
@@ -132,19 +141,19 @@ public class JudgeServiceImpl implements JudgeService {
         String judgeConfigStr = problem.getJudgeConfig();
         JudgeConfig judgeConfig = JSONUtil.toBean(judgeConfigStr, JudgeConfig.class);
         if (time > judgeConfig.getTimeLimit()) {
-            judgeResult.setMessage(ProblemSubmitJudgeResultEnum.TIME_LIMIT_EXCEEDED.getValue());
+            judgeResult.setResult(ProblemSubmitJudgeResultEnum.TIME_LIMIT_EXCEEDED.getValue());
             problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
             problemSubmitService.updateById(problemSubmit);
             return;
         }
         if (memory > judgeConfig.getMemoryLimit()) {
-            judgeResult.setMessage(ProblemSubmitJudgeResultEnum.MEMORY_LIMIT_EXCEEDED.getValue());
+            judgeResult.setResult(ProblemSubmitJudgeResultEnum.MEMORY_LIMIT_EXCEEDED.getValue());
             problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
             problemSubmitService.updateById(problemSubmit);
             return;
         }
 
-        judgeResult.setMessage(ProblemSubmitJudgeResultEnum.ACCEPTED.getValue());
+        judgeResult.setResult(ProblemSubmitJudgeResultEnum.ACCEPTED.getValue());
         problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
         problemSubmitService.updateById(problemSubmit);
     }

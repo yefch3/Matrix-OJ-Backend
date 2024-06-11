@@ -17,7 +17,5 @@ public class ExecuteCodeResponse {
 
     private String apiMessage;
 
-    private Integer status;
-
     private JudgeResult judgeResult;
 }
