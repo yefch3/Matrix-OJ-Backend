@@ -23,6 +23,7 @@ import com.fangchen.oj.service.UserService;
 import com.fangchen.oj.utils.SqlUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,7 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
     @Resource
     private UserService userService;
 
+    @Lazy
     @Resource
     private JudgeService judgeService;
 

@@ -8,12 +8,12 @@ import com.fangchen.oj.judge.codesandbox.CodeSandBoxFactory;
 import com.fangchen.oj.judge.codesandbox.CodeSandBoxProxy;
 import com.fangchen.oj.judge.codesandbox.model.ExecuteCodeRequest;
 import com.fangchen.oj.judge.codesandbox.model.ExecuteCodeResponse;
+import com.fangchen.oj.judge.strategy.JudgeStrategy;
+import com.fangchen.oj.judge.strategy.model.JudgeContext;
 import com.fangchen.oj.model.dto.problem.JudgeCase;
-import com.fangchen.oj.model.dto.problem.JudgeConfig;
 import com.fangchen.oj.model.dto.problemsubmit.JudgeResult;
 import com.fangchen.oj.model.entity.Problem;
 import com.fangchen.oj.model.entity.ProblemSubmit;
-import com.fangchen.oj.model.enums.ProblemSubmitJudgeResultEnum;
 import com.fangchen.oj.model.enums.ProblemSubmitStatusEnum;
 import com.fangchen.oj.service.ProblemService;
 import com.fangchen.oj.service.ProblemSubmitService;
@@ -21,14 +21,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class JudgeServiceImpl implements JudgeService {
 
-    @Value("${judge.type}")
+    @Value("${codesandbox.type}")
     private String type;
 
     @Resource
@@ -36,6 +35,9 @@ public class JudgeServiceImpl implements JudgeService {
 
     @Resource
     private ProblemSubmitService problemSubmitService;
+
+    @Resource
+    private JudgeStrategy judgeStrategy;
 
     @Override
     public void doJudge(long problemSubmitId) {
@@ -48,14 +50,9 @@ public class JudgeServiceImpl implements JudgeService {
 
         // 获取题目提交详细信息
         Long problemId = problemSubmit.getProblemId();
-        Long userId = problemSubmit.getUserId();
         String language = problemSubmit.getLanguage();
         String code = problemSubmit.getCode();
         Integer status = problemSubmit.getStatus();
-        String previousJudgeResult = problemSubmit.getJudgeResult();
-        Date createTime = problemSubmit.getCreateTime();
-        Date updateTime = problemSubmit.getUpdateTime();
-        Integer isDelete = problemSubmit.getIsDelete();
 
         // 获取题目信息
         Problem problem = problemService.getById(problemId);
@@ -94,67 +91,28 @@ public class JudgeServiceImpl implements JudgeService {
         // 如果执行结果为空，则执行代码失败
         if (executeCodeResponse == null) {
             problemSubmit.setStatus(ProblemSubmitStatusEnum.FAILED.getValue());
-            problemSubmitService.updateById(problemSubmit);
+            isUpdate = problemSubmitService.updateById(problemSubmit);
+            if (!isUpdate) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新提交信息失败");
+            }
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "判题失败");
         }
 
+
+        // 获取执行结果，执行代码的借口中仅仅会执行内存时间和信息，是否通过测试暂时定为等待状态
         JudgeResult judgeResult = executeCodeResponse.getJudgeResult();
-        Long memory = judgeResult.getMemory();
-        Long time = judgeResult.getTime();
         List<String> outputList = executeCodeResponse.getOutputList();
 
         // 更新题目提交状态为执行代码完成
         problemSubmit.setStatus(ProblemSubmitStatusEnum.SUCCEED.getValue());
 
-        // 如果没有输出或者一些情况下，说明出现了编译错误或者系统错误等等，todo: 需要根据具体情况进行判断，暂时归结为编译错误
-        if (outputList == null || outputList.isEmpty()) {
-            judgeResult.setResult(ProblemSubmitJudgeResultEnum.COMPILE_ERROR.getValue());
-            problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
-            problemSubmitService.updateById(problemSubmit);
-            return;
-        }
-
-        // 根据执行结果，判断是否通过
-        // 1. 判断输出size和测试用例size是否一致
-        // 2. 判断每个输出是否和测试用例输出一致
-        // 3. 判断题目限制条件是否满足
-
-        // 判断输出size和测试用例size是否一致
-        if (outputList.size() != caseList.size()) {
-            judgeResult.setResult(ProblemSubmitJudgeResultEnum.WRONG_ANSWER.getValue());
-            problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
-            problemSubmitService.updateById(problemSubmit);
-            return;
-        }
-
-        // 判断每个输出是否和测试用例输出一致
-        for (int i = 0; i < outputList.size(); i++) {
-            if (!outputList.get(i).equals(caseList.get(i).getOutput())) {
-                judgeResult.setResult(ProblemSubmitJudgeResultEnum.WRONG_ANSWER.getValue());
-                problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
-                problemSubmitService.updateById(problemSubmit);
-                return;
-            }
-        }
-
-        // 判断题目限制条件是否满足
-        String judgeConfigStr = problem.getJudgeConfig();
-        JudgeConfig judgeConfig = JSONUtil.toBean(judgeConfigStr, JudgeConfig.class);
-        if (time > judgeConfig.getTimeLimit()) {
-            judgeResult.setResult(ProblemSubmitJudgeResultEnum.TIME_LIMIT_EXCEEDED.getValue());
-            problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
-            problemSubmitService.updateById(problemSubmit);
-            return;
-        }
-        if (memory > judgeConfig.getMemoryLimit()) {
-            judgeResult.setResult(ProblemSubmitJudgeResultEnum.MEMORY_LIMIT_EXCEEDED.getValue());
-            problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
-            problemSubmitService.updateById(problemSubmit);
-            return;
-        }
-
-        judgeResult.setResult(ProblemSubmitJudgeResultEnum.ACCEPTED.getValue());
+        // 根据执行结果，判断是否通过，即执行判题策略，在这个策略接口中会修改judgeResult的结果
+        JudgeContext judgeContext = new JudgeContext(judgeResult, inputList, outputList, caseList, problem);
+        judgeResult = judgeStrategy.executeStrategy(judgeContext);
         problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
-        problemSubmitService.updateById(problemSubmit);
+        isUpdate =  problemSubmitService.updateById(problemSubmit);
+        if (!isUpdate) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新提交信息失败");
+        }
     }
 }

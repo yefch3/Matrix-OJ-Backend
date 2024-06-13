@@ -2,9 +2,11 @@ package com.fangchen.oj.model.dto.problemsubmit;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class JudgeResult {
     /**
      * 判题信息，程序执行信息，消耗内存，消耗时间
