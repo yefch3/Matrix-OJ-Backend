@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -87,8 +88,12 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "Submit Error");
         }
         // todo: judge
-        judgeService.doJudge(problemSubmit.getId());
-        return problemSubmit.getId();
+        Long problemSubmitId = problemSubmit.getId();
+//        CompletableFuture.runAsync(() -> {
+//            judgeService.doJudge(problemSubmitId);
+//        });
+        judgeService.doJudge(problemSubmitId);
+        return problemSubmitId;
     }
 
     /**
