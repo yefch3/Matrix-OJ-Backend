@@ -86,6 +86,8 @@ public class JudgeServiceImpl implements JudgeService {
                 .inputList(inputList)
                 .language(language)
                 .build();
+
+        // 调用沙箱执行代码
         ExecuteCodeResponse executeCodeResponse = codeSandBoxProxy.executeCode(executeCodeRequest);
 
         // 如果执行结果为空，则执行代码失败
