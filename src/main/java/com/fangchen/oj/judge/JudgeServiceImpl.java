@@ -99,14 +99,14 @@ public class JudgeServiceImpl implements JudgeService {
         }
 
 
-        // 获取执行结果，执行代码的借口中仅仅会执行内存时间和信息，是否通过测试暂时定为等待状态
+        // 获取执行结果，执行代码的接口中仅仅会执行内存时间和信息，是否通过测试暂时定为等待状态
         JudgeResult judgeResult = executeCodeResponse.getJudgeResult();
         List<String> outputList = executeCodeResponse.getOutputList();
 
         // 更新题目提交状态为执行代码完成
         problemSubmit.setStatus(ProblemSubmitStatusEnum.SUCCEED.getValue());
 
-        // 根据执行结果，判断是否通过，即执行判题策略，在这个策略接口中会修改judgeResult的结果
+        // 根据执行结果，判断是否通过，即执行判题策略，在这个策略接口中会修改judgeResult的result
         JudgeContext judgeContext = new JudgeContext(judgeResult, inputList, outputList, caseList, problem);
         judgeResult = judgeStrategy.executeStrategy(judgeContext);
         problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));

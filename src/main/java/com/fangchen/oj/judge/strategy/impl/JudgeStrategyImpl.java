@@ -9,8 +9,6 @@ import com.fangchen.oj.model.dto.problem.JudgeConfig;
 import com.fangchen.oj.model.dto.problemsubmit.JudgeResult;
 import com.fangchen.oj.model.entity.Problem;
 import com.fangchen.oj.model.enums.ProblemSubmitJudgeResultEnum;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
