@@ -13,11 +13,6 @@ import java.util.List;
 public class ExampleCodeSandBox implements CodeSandBox {
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) {
-        System.out.println("ExampleCodeSandBox execute code");
-        List<String> outputList = new ArrayList<>();
-        outputList.add("3 4 5");
-        String message = "No Probelm";
-        JudgeResult judgeResult = new JudgeResult("Run Successfully", ProblemSubmitJudgeResultEnum.WAITING.getValue(), 100L, 100L);
-        return new ExecuteCodeResponse(outputList, message, judgeResult);
+        return null;
     }
 }

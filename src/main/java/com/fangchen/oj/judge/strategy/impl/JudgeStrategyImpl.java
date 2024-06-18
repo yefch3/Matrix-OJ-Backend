@@ -1,6 +1,5 @@
 package com.fangchen.oj.judge.strategy.impl;
 
-import cn.hutool.core.lang.Console;
 import cn.hutool.json.JSONUtil;
 import com.fangchen.oj.judge.strategy.JudgeStrategy;
 import com.fangchen.oj.judge.strategy.model.JudgeContext;
@@ -39,10 +38,7 @@ public class JudgeStrategyImpl implements JudgeStrategy {
 
         // 判断每个输出是否和测试用例输出一致
         for (int i = 0; i < outputList.size(); i++) {
-//            Console.log("output: " + outputList.get(i));
-//            Console.log("judgeCase: " + judgeCaseList.get(i).getOutput());
             if (!outputList.get(i).equals(judgeCaseList.get(i).getOutput())) {
-//                System.out.println("测试用例输出和实际输出不一致");
                 judgeResult.setResult(ProblemSubmitJudgeResultEnum.WRONG_ANSWER.getValue());
                 return judgeResult;
             }

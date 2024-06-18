@@ -11,6 +11,7 @@ import com.fangchen.oj.judge.codesandbox.model.ExecuteCodeResponse;
 import com.fangchen.oj.judge.strategy.JudgeStrategy;
 import com.fangchen.oj.judge.strategy.model.JudgeContext;
 import com.fangchen.oj.model.dto.problem.JudgeCase;
+import com.fangchen.oj.model.dto.problem.JudgeConfig;
 import com.fangchen.oj.model.dto.problemsubmit.JudgeResult;
 import com.fangchen.oj.model.entity.Problem;
 import com.fangchen.oj.model.entity.ProblemSubmit;
@@ -56,9 +57,9 @@ public class JudgeServiceImpl implements JudgeService {
 
         // 获取题目信息
         Problem problem = problemService.getById(problemId);
-        if (problem == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "题目信息不存在");
-        }
+        JudgeConfig judgeConfig = JSONUtil.toBean(problem.getJudgeConfig(), JudgeConfig.class);
+        long timiLimit = judgeConfig.getTimeLimit();
+        long memoryLimit = judgeConfig.getMemoryLimit();
 
         // 获取测试用例信息
         String judgeCaseStr = problem.getJudgeCase();
@@ -85,6 +86,8 @@ public class JudgeServiceImpl implements JudgeService {
                 .code(code)
                 .inputList(inputList)
                 .language(language)
+                .timeLimit(timiLimit)
+                .memoryLimit(memoryLimit)
                 .build();
 
         // 调用沙箱执行代码
