@@ -1,5 +1,6 @@
 package com.fangchen.oj.judge.strategy.model;
 
+import com.fangchen.oj.judge.codesandbox.model.ExecuteCodeResponse;
 import com.fangchen.oj.model.dto.problem.JudgeCase;
 import com.fangchen.oj.model.dto.problemsubmit.JudgeResult;
 import com.fangchen.oj.model.entity.Problem;
@@ -14,11 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class JudgeContext {
 
-    private JudgeResult judgeResult;
-
-    private List<String> inputList;
-
-    private List<String> outputList;
+    private ExecuteCodeResponse executeCodeResponse;
 
     private List<JudgeCase> judgeCaseList;
 

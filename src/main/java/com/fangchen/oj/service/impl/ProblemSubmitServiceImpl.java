@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +55,7 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
      * @return problemSubmitId
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public long doProblemSubmit(ProblemSubmitAddRequest problemSubmitAddRequest, User loginUser) {
         // 判断语言是否合法
         ProblemSubmitLanguageEnum language = ProblemSubmitLanguageEnum.getEnumByValue(problemSubmitAddRequest.getLanguage());

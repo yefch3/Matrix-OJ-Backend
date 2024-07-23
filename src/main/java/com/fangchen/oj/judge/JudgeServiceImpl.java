@@ -20,12 +20,14 @@ import com.fangchen.oj.service.ProblemService;
 import com.fangchen.oj.service.ProblemSubmitService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class JudgeServiceImpl implements JudgeService {
 
     @Value("${codesandbox.type}")
@@ -104,16 +106,15 @@ public class JudgeServiceImpl implements JudgeService {
         }
 
 
-        // 获取执行结果，执行代码的接口中仅仅会执行内存时间和信息，是否通过测试暂时定为等待状态
-        JudgeResult judgeResult = executeCodeResponse.getJudgeResult();
-        List<String> outputList = executeCodeResponse.getOutputList();
-
         // 更新题目提交状态为执行代码完成
         problemSubmit.setStatus(ProblemSubmitStatusEnum.SUCCEED.getValue());
 
         // 根据执行结果，判断是否通过，即执行判题策略，在这个策略接口中会修改judgeResult的result
-        JudgeContext judgeContext = new JudgeContext(judgeResult, inputList, outputList, caseList, problem);
-        judgeResult = judgeStrategy.executeStrategy(judgeContext);
+        JudgeContext judgeContext = new JudgeContext();
+        judgeContext.setExecuteCodeResponse(executeCodeResponse);
+        judgeContext.setJudgeCaseList(caseList);
+        judgeContext.setProblem(problem);
+        JudgeResult judgeResult = judgeStrategy.executeStrategy(judgeContext);
         problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
         isUpdate =  problemSubmitService.updateById(problemSubmit);
         if (!isUpdate) {
