@@ -15,6 +15,7 @@ import com.fangchen.oj.model.dto.problem.JudgeConfig;
 import com.fangchen.oj.model.dto.problemsubmit.JudgeResult;
 import com.fangchen.oj.model.entity.Problem;
 import com.fangchen.oj.model.entity.ProblemSubmit;
+import com.fangchen.oj.model.enums.ProblemSubmitJudgeResultEnum;
 import com.fangchen.oj.model.enums.ProblemSubmitStatusEnum;
 import com.fangchen.oj.service.ProblemService;
 import com.fangchen.oj.service.ProblemSubmitService;
@@ -74,8 +75,8 @@ public class JudgeServiceImpl implements JudgeService {
 
         // 更新题目提交状态为判题中
         problemSubmit.setStatus(ProblemSubmitStatusEnum.JUDGING.getValue());
-        boolean isUpdate = problemSubmitService.updateById(problemSubmit);
-        if (!isUpdate) {
+        boolean problemSubmitUpdate = problemSubmitService.updateById(problemSubmit);
+        if (!problemSubmitUpdate) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新提交信息失败");
         }
 
@@ -98,8 +99,8 @@ public class JudgeServiceImpl implements JudgeService {
         // 如果执行结果为空，则执行代码失败
         if (executeCodeResponse == null) {
             problemSubmit.setStatus(ProblemSubmitStatusEnum.FAILED.getValue());
-            isUpdate = problemSubmitService.updateById(problemSubmit);
-            if (!isUpdate) {
+            problemSubmitUpdate = problemSubmitService.updateById(problemSubmit);
+            if (!problemSubmitUpdate) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新提交信息失败");
             }
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "判题失败");
@@ -115,9 +116,19 @@ public class JudgeServiceImpl implements JudgeService {
         judgeContext.setJudgeCaseList(caseList);
         judgeContext.setProblem(problem);
         JudgeResult judgeResult = judgeStrategy.executeStrategy(judgeContext);
+
+        if (judgeResult.getResult().equals(ProblemSubmitJudgeResultEnum.ACCEPTED.getValue())) {
+            problem.setAcceptNum(problem.getAcceptNum() + 1);
+        }
+        problem.setSubmitNum(problem.getSubmitNum() + 1);
+        boolean problemUpdate = problemService.updateById(problem);
+        if (!problemUpdate) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新题目信息失败");
+        }
+
         problemSubmit.setJudgeResult(JSONUtil.toJsonStr(judgeResult));
-        isUpdate =  problemSubmitService.updateById(problemSubmit);
-        if (!isUpdate) {
+        problemSubmitUpdate =  problemSubmitService.updateById(problemSubmit);
+        if (!problemSubmitUpdate) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新提交信息失败");
         }
     }

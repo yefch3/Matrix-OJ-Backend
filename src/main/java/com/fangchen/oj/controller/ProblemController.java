@@ -46,9 +46,6 @@ public class ProblemController {
     /**
      * 创建
      *
-     * @param problemAddRequest
-     * @param request
-     * @return
      */
     @PostMapping("/add")
     public BaseResponse<Long> addProblem(@RequestBody ProblemAddRequest problemAddRequest, HttpServletRequest request) {
@@ -83,9 +80,6 @@ public class ProblemController {
     /**
      * 删除
      *
-     * @param deleteRequest
-     * @param request
-     * @return
      */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteProblem(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
@@ -108,8 +102,6 @@ public class ProblemController {
     /**
      * 更新（仅管理员）
      *
-     * @param problemUpdateRequest
-     * @return
      */
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -144,8 +136,6 @@ public class ProblemController {
     /**
      * 根据 id 获取所有数据
      *
-     * @param id
-     * @return
      */
     // todo 优化：增加权限校验，如果是管理员那么可以看到某些字段
     @GetMapping("/get")
@@ -168,8 +158,6 @@ public class ProblemController {
     /**
      * 根据 id 获取脱敏数据
      *
-     * @param id
-     * @return
      */
     @GetMapping("/get/vo")
     public BaseResponse<ProblemVO> getProblemVOById(long id, HttpServletRequest request) {
@@ -186,8 +174,6 @@ public class ProblemController {
     /**
      * 分页获取列表（仅管理员）
      *
-     * @param problemQueryRequest
-     * @return
      */
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -202,9 +188,6 @@ public class ProblemController {
     /**
      * 分页获取列表（封装类）
      *
-     * @param problemQueryRequest
-     * @param request
-     * @return
      */
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<ProblemVO>> listProblemVOByPage(@RequestBody ProblemQueryRequest problemQueryRequest,
@@ -221,9 +204,6 @@ public class ProblemController {
     /**
      * 分页获取当前用户创建的资源列表
      *
-     * @param problemQueryRequest
-     * @param request
-     * @return
      */
     @PostMapping("/my/list/page/vo")
     public BaseResponse<Page<ProblemVO>> listMyProblemVOByPage(@RequestBody ProblemQueryRequest problemQueryRequest,
@@ -247,10 +227,8 @@ public class ProblemController {
 //    /**
 //     * 分页搜索（从 ES 查询，封装类）
 //     *
-//     * @param problemQueryRequest
-//     * @param request
-//     * @return
 //     */
+//    @Deprecated
 //    @PostMapping("/search/page/vo")
 //    public BaseResponse<Page<ProblemVO>> searchProblemVOByPage(@RequestBody ProblemQueryRequest problemQueryRequest,
 //                                                         HttpServletRequest request) {
@@ -264,9 +242,6 @@ public class ProblemController {
     /**
      * 编辑（用户）
      *
-     * @param problemEditRequest
-     * @param request
-     * @return
      */
     @PostMapping("/edit")
     public BaseResponse<Boolean> editProblem(@RequestBody ProblemEditRequest problemEditRequest, HttpServletRequest request) {

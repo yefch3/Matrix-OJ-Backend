@@ -1,16 +1,12 @@
 package com.fangchen.oj.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fangchen.oj.annotation.AuthCheck;
 import com.fangchen.oj.common.BaseResponse;
 import com.fangchen.oj.common.ErrorCode;
 import com.fangchen.oj.common.ResultUtils;
-import com.fangchen.oj.constant.UserConstant;
 import com.fangchen.oj.exception.BusinessException;
-import com.fangchen.oj.model.dto.post.PostQueryRequest;
 import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitAddRequest;
 import com.fangchen.oj.model.dto.problemsubmit.ProblemSubmitQueryRequest;
-import com.fangchen.oj.model.entity.Post;
 import com.fangchen.oj.model.entity.ProblemSubmit;
 import com.fangchen.oj.model.entity.User;
 import com.fangchen.oj.model.vo.ProblemSubmitVO;

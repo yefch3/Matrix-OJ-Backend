@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity com.fangchen.oj.model.entity.ProblemSubmit
 */
 public interface ProblemSubmitMapper extends BaseMapper<ProblemSubmit> {
-
+    //
 }
 
 

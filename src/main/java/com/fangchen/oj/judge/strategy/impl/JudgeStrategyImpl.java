@@ -25,7 +25,9 @@ public class JudgeStrategyImpl implements JudgeStrategy {
         List<JudgeCase> judgeCaseList = judgeContext.getJudgeCaseList();
         Problem problem = judgeContext.getProblem();
         long timeLimit = JSONUtil.toBean(problem.getJudgeConfig(), JudgeConfig.class).getTimeLimit();
-        long memoryLimit = JSONUtil.toBean(problem.getJudgeConfig(), JudgeConfig.class).getMemoryLimit();
+        long memoryLimit = JSONUtil.toBean(problem.getJudgeConfig(), JudgeConfig.class).getMemoryLimit() * 1024 * 1024;
+        long timeMax = 0;
+        long memoryMax = 0;
 
 
         JudgeResult judgeResult = new JudgeResult();
@@ -54,6 +56,8 @@ public class JudgeStrategyImpl implements JudgeStrategy {
         for (int i = 0; i < outputList.size(); i++) {
             JudgeCase judgeCase = judgeCaseList.get(i);
             String output = outputList.get(i);
+            timeMax = Math.max(timeMax, executeCodeResponse.getTimeList().get(i));
+            memoryMax = Math.max(memoryMax, executeCodeResponse.getMemoryList().get(i));
             if (!Objects.equals(output, judgeCase.getOutput())) {
                 judgeResult.setResult(ProblemSubmitJudgeResultEnum.WRONG_ANSWER.getValue());
                 judgeResult.setMessage("Wrong Answer in Case " + (i + 1));
@@ -71,6 +75,9 @@ public class JudgeStrategyImpl implements JudgeStrategy {
 
         judgeResult.setResult(ProblemSubmitJudgeResultEnum.ACCEPTED.getValue());
         judgeResult.setMessage("Accepted");
+        judgeResult.setTime(timeMax);
+        judgeResult.setMemory(memoryMax);
+
         return judgeResult;
     }
 }

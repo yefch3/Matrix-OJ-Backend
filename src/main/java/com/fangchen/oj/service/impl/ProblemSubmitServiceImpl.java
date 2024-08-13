@@ -1,6 +1,5 @@
 package com.fangchen.oj.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -178,15 +177,19 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
 
     @Override
     public Page<ProblemSubmitVO> getProblemSubmitVOPage(Page<ProblemSubmit> problemSubmitPage, User loginUser) {
-        List<ProblemSubmit> problemSubmitList = problemSubmitPage.getRecords();
-        Page<ProblemSubmitVO> problemSubmitVOPage = new Page<>(problemSubmitPage.getCurrent(), problemSubmitPage.getSize(), problemSubmitPage.getTotal());
-        if (CollUtil.isEmpty(problemSubmitList)) {
-            return problemSubmitVOPage;
-        }
-        // 填充信息
-        List<ProblemSubmitVO> problemSubmitVOList = problemSubmitList.stream()
+        QueryWrapper<ProblemSubmit> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("createTime");
+
+        // 执行分页查询
+        Page<ProblemSubmit> resultPage = this.page(problemSubmitPage, queryWrapper);
+
+        // 将结果转换为 ProblemSubmitVO
+        List<ProblemSubmitVO> problemSubmitVOList = resultPage.getRecords().stream()
                 .map(problemSubmit -> getProblemSubmitVO(problemSubmit, loginUser))
                 .collect(Collectors.toList());
+
+        // 创建并返回分页结果
+        Page<ProblemSubmitVO> problemSubmitVOPage = new Page<>(resultPage.getCurrent(), resultPage.getSize(), resultPage.getTotal());
         problemSubmitVOPage.setRecords(problemSubmitVOList);
         return problemSubmitVOPage;
     }
